@@ -1,0 +1,31 @@
+#! /bin/bash
+
+#poging 1: knip file op in $2 delen
+
+if [ $# -lt 2 ]; then
+	echo "useage: slicer1 [filename] [parts]"
+	exit
+else
+	FILENAME=$1
+	echo "filename: `basename:${FILENAME}`"
+	LENGTH=`soxi -D ${FILENAME}`
+	echo "length: ${LENGTH}"
+	SLICEL=`echo "scale=10; ${LENGTH}/$2" | bc`
+	echo "slice-length: ${SLICEL}"
+
+	DIR=`pwd`"/slices"
+	echo "dir: ${DIR}"
+	mkdir ${DIR}
+
+	FILES=`echo "${2}-1" | bc`
+	for i in `seq 0 $FILES`  
+	do
+		START=`echo "scale=10; ${SLICEL}*$i" | bc`
+		END=`echo "scale=10; ${SLICEL}*($i+1)" | bc`
+		SLICENAME="${DIR}/$i.wav"
+		echo "slicename: ${SLICENAME}"
+		echo "start: ${START}; end: ${END}"
+
+		sox ${FILENAME} ${SLICENAME} trim ${START} ${SLICEL}
+	done
+fi
