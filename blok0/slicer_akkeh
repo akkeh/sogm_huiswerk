@@ -1,6 +1,7 @@
 #! /bin/bash
 
-#poging 1: knip file op in $2 delen
+# akke houben (2122022)
+# poging 1: knip file $1 op in $2 delen
 
 if [ $# -lt 2 ]; then
 	echo "useage: slicer1 [filename] [parts]"
