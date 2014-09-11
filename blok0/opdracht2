@@ -1,0 +1,35 @@
+#! /bin/bash
+
+# opdracht 2 akke houben 2122022
+
+if [ $# -lt 2 ]; then
+	echo "usage: [file extention] [destination extention]"
+	exit
+else
+	PROMPT=
+	while [ -z $PROMPT ] 
+	do
+		echo -n 'ga door met conversie y/n?'
+		read PROMPT
+	done
+	if [ $PROMPT = 'y' ]; then
+		echo "Converting"
+	else
+		echo "user break"
+		exit
+	fi
+fi
+
+mkdir converted
+
+for item in *$1 
+do
+	OUT=`basename ${item} $1`$2
+	TARGET="converted/"${OUT}	
+	echo "converting ${item} to ${TARGET}"
+	if [ $2 = ".mp3" ]; then
+		lame ${item} ${TARGET}	
+	else	
+		ffmpeg -i ${item} ${TARGET} 
+	fi
+done
