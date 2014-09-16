@@ -4,8 +4,8 @@
 # poging 1: knip file $1 op in $2 delen
 # 
 
-if [ $# -lt 2 ]; then
-	echo "useage: slicer1 [filename] [parts]"
+if [ $# -lt 3 ]; then
+	echo "useage: slicer1 [filename] [parts] [extention]"
 	exit
 else
 	FILENAME=$1
@@ -24,7 +24,7 @@ else
 	do
 		START=`echo "scale=10; ${SLICEL}*$i" | bc`
 		END=`echo "scale=10; ${SLICEL}*($i+1)" | bc`
-		SLICENAME="${DIR}/$i.wav"
+		SLICENAME="${DIR}/$i$3"
 		echo "slicename: ${SLICENAME}"
 		echo "start: ${START}; end: ${END}"
 
