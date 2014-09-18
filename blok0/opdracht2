@@ -6,6 +6,8 @@ if [ $# -lt 2 ]; then
 	echo "usage: [file extention] [destination extention]"
 	exit
 else
+	IN_TYPE=$1
+	OUT_TYPE=$2
 	PROMPT=
 	while [ -z $PROMPT ] 
 	do
@@ -20,16 +22,21 @@ else
 	fi
 fi
 
-mkdir converted
+DIR="`pwd`/converted"
+echo "${DIR}"
 
-for item in *$1 
+if [ ! -d "${DIR}" ]; then
+	mkdir "${DIR}"
+fi
+
+for item in *$IN_TYPE 
 do
-	OUT=`basename ${item} $1`$2
-	TARGET="converted/"${OUT}	
+	OUT=`basename "${item}" $1`$2
+	TARGET="converted/""${OUT}"	
 	echo "converting ${item} to ${TARGET}"
 	if [ $2 = ".mp3" ]; then
-		lame ${item} ${TARGET}	
+		lame "${item}" "${TARGET}"	
 	else	
-		ffmpeg -i ${item} ${TARGET} 
+		ffmpeg -i "${item}" "${TARGET}" 
 	fi
 done
