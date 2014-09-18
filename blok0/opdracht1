@@ -20,7 +20,9 @@ else
 
 	DIR=`dirname "${FILENAME}"`/slices
 	echo "dir: ${DIR}"
-	mkdir "${DIR}"
+	if [ ! -d "${DIR}" ]; then
+		mkdir "${DIR}"
+	fi
 	
 	FILES=`echo "${2}-1" | bc`
 	for i in `seq 0 $FILES`  
