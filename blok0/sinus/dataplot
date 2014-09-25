@@ -1,0 +1,7 @@
+#! /bin/bash
+
+`rm -f data.txt`
+`g++ -o cppout sinus.cpp`
+`./cppout>data.txt`
+`gnuplot plot`
+`eog outplot.png`
