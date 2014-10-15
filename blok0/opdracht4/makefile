@@ -6,8 +6,8 @@ dir:
 	mkdir -p ${DIR}
 
 telop: optellen.cpp
-	g++ -c optellen.cpp -o ${DIR}/optellen.o
-	g++ -o $@ ${DIR}/optellen.o 
+	g++ -c optellen.cpp -o ${DIR}/optellen.o	#creates $@.o file
+	g++ -o $@ ${DIR}/optellen.o			#creates exe from .o file 
 
 
 print_array: print_array.cpp
