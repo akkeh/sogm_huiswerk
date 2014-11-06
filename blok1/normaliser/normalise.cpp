@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
     int fs = in_info.samplerate;
     int num_frames = in_info.frames;
     int chn_num = in_info.channels;
+    printf("length of file: %fs\n", float(num_frames)/fs);
     printf("samplerate: %i\n", fs);
     printf("num_frames: %i\n", num_frames);
     printf("channels: %i\n", chn_num);
@@ -36,6 +37,9 @@ int main(int argc, char** argv) {
     float buffer[num_frames*chn_num];
     int frames_read = sf_readf_float(in_file, buffer, num_frames);
     printf("read %i frames form file\n", frames_read);
+    for(int i=0; i<frames_read; i++) {
+        printf("sample %i:\t%f\n", i, buffer[i]);
+    }
     float max_val = 0; 
     float abs_val;
     for(int n=0; n<num_frames*chn_num; n++) {
@@ -44,8 +48,8 @@ int main(int argc, char** argv) {
             max_val = abs_val;
         }
     }
-    printf("max val: %f\n", max_val);
-    printf("new max: %f\n", max_val*gain);
+    printf("peak value: %fdB\n", 20*std::log(max_val));
+    printf("new max: %fdB\n", 20*std::log(max_val*gain));
     for(int n=0; n<num_frames*chn_num; n++) {
         buffer[n] = buffer[n]/max_val * gain;
     }
