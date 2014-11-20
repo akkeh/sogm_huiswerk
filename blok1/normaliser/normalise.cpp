@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     if(argc != NUM_ARGS) {
         printf("usage: normaliser [filepath] [gain]\n");
         printf("normaliser sets amplitude to 0dB\n");
-        printf("gain is used to change amplitude.\n");
+        printf("gain is used to change amplitude after normalisation.\n");
         return -1;
     }
     //char* name = argv[ARG_NAME];        // ARG_NAME = 0 (uit enum)
