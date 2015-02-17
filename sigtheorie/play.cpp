@@ -1,6 +1,20 @@
 #include <iostream>
 #include "play.h"
+#include <cmath>
 #include <alsa/asoundlib.h>
+
+
+float* pnormalise(float* arr, unsigned long N) {
+    float* out = new float[N];
+    float val, max;
+    for(unsigned long n=0; n<N; n++) {
+        if((val = std::sqrt(arr[n]*arr[n])) > max) max = val;
+    }   
+    for(unsigned long n=0; n<N; n++) {
+        out[n] = arr[n] / val;
+    }   
+    return out;
+}
 
 void Player::play(float* data, long N) {
 	long len = buf_size;
@@ -30,6 +44,43 @@ void Player::play(float* data, long N) {
 	
 }
 
+void Player::play_file(int order, float* coeff) {
+    std::cout << "loadfile\n";
+    load_file();
+    std::cout << "playing\n";
+    process(order, coeff);
+};
+
+int Player::load_file() {
+    std::cout << "enter filepath: \n";
+    std::string filepath;
+    std::cin >> filepath;
+    read(filepath.c_str());
+    return 0;
+};
+
+int Player::process(int order, float* coeff) {
+    float out;
+    int maxorder = 0;
+    float* out_data = new float[N+order]; 
+    for(unsigned long n=0; n<N+order; n++) {
+        out = 0;
+        for(int i=0; i<maxorder; i++) {
+            out += this->samples[n-i] * coeff[i];
+        }
+        if(maxorder < order) maxorder++;
+        out_data[n] = out;
+    }
+    this->samples = out_data;
+    this->N = N+order;
+}
+
+int Player::write_file() {
+    std::cout << "enter filepath: \n";
+    std::string filepath;
+    std::cin >> filepath;
+    write(filepath.c_str(), this->samples, this->N);
+}
 
 Player::Player() {
 

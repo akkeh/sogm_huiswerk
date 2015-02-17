@@ -1,6 +1,7 @@
 #include <fstream>
 #include <string>
 
+
 class Song {
 // INTERFACE VAN CLASS:
 private:

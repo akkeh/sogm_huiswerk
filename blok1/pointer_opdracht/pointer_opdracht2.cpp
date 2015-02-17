@@ -6,7 +6,7 @@ int pass_value(int in_val) {        // pass-by-value
     return in_val;
 }
 
-int pass_ptr(int* in_val) {         //pass pointer? == pass by reference?
+int pass_ptr(int* in_val) {         //pass-by-pointer (== pass by reference?)
     *in_val = 5;
     return *in_val;
 }

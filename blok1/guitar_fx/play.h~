@@ -27,47 +27,18 @@
 *  E-mail        : marcg@dinkum.nl
 *
 **********************************************************************/
-
+#ifndef _PLAY_H_
+#define _PLAY_H_
 #include <iostream>
-#include <cstdlib>
-#include <cmath>
-#include "amp.h"
-#include "del.h"
-#include "play.h"
-
-#define BUFFERSIZE 10
-
-int main()
+#include <alsa/asoundlib.h>
+class Player
 {
-	Player player;
-	Amplifier amp;
-	amp.set_level(100);
-  	amp.show_level();
+public:
+	Player();
+	void play(float* data, long N);
+private:
+	long buf_size;
+	snd_pcm_t *pcm_handle;
+};
 
-	Delay del;
-	del.set_delt(1004);
-	std::cout<<del.get_delt()<<std::endl;
-	long N = 441000;
-	long fs = 44100;
-	float dat[N];
-	for(long n=0; n<N; n++) {
-		dat[n] = std::sin(2.0*M_PI * n * 200 / fs);
-	}
-	float* test = amp.process(dat, N);
-	/*
-    for(long n=0; n<N; n++) {
-		std::cout<<"sample "<<dat[n]<<" ampl: "<<test[n]<<std::endl;
-	}
-    */
-	del.set_delt(10000);
-
-	float* deltest = del.process(dat, N);
-	/*
-    for(long n=0; n<N+del.get_delt(); n++) {
-		std::cout<<deltest[n]<<std::endl;
-	}
-    */
-	player.play(deltest, N+del.get_delt());
-
-} // main()
-
+#endif

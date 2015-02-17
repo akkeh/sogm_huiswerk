@@ -48,10 +48,9 @@ int main()
 	del.set_delt(1004);
 	std::cout<<del.get_delt()<<std::endl;
 	long N = 441000;
-	long fs = 44100;
 	float dat[N];
 	for(long n=0; n<N; n++) {
-		dat[n] = std::sin(2.0*M_PI * n * 200 / fs);
+		dat[n] = std::sin(2.0*M_PI * n * 200 / N);
 	}
 	float* test = amp.process(dat, N);
 	/*
