@@ -1,0 +1,3 @@
+
+typedef void *iets  // 'blackbox' waardoor gebruiker niet hoeft te weten wat het is + kan veranderd worden zonder problemen
+
