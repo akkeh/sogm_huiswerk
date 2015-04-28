@@ -93,7 +93,6 @@ private:
     event_ptr prev; // previously added event
     unsigned long t0, tN;
 
-    int add(event_ptr new_event, int rev);
 };  // scheduler
 
 
