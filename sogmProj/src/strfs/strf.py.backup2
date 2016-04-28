@@ -1,0 +1,119 @@
+import numpy as np
+from numpy.fft import fft, ifft
+import matplotlib.pyplot as plt
+
+def STRW(x, om, OM, up):
+    
+
+def STRF(x, oms = [1, 300], tc = 10, OMs = [0.25, 8], sc = 10):
+    y = np.ndarray(shape=(sc, tc, sc, tc), dtype='complex')
+    y.fill(0)
+
+    t = (oms[2]-oms[1]) / float(tc) * np.arange(tc) + oms[1]
+    s = (OMs[2]-OMs[1]) / float(sc) * np.arange(sc) + OMs[1]
+
+    for om in range(tc):
+        for OM in range(ts):
+            
+            y[om, OM, phi, PHI] = 
+
+def STR(x, om, OM, phi, PHI, up):  # spectro-temporal response of 1 cell
+    M = len(x)
+    N = len(x[0])
+    
+    s = (20000-20) * np.log2(1 + np.arange(M)/float(M)) + 20
+    t = np.arange(N) / 44100.0
+    
+    # calc. responses:
+    h = np.ndarray(shape=(N, M), dtype='complex')
+    
+    # spectral responses:
+    print "spectral responses"
+    for n in range(N):
+        hirs = spec(s, OM, PHI)
+        h[n] = hirs
+     
+    # temporal responses:
+    print "temporal responses"
+    h = h.transpose()
+    for m in range(M):
+        hirt = temp(t, om, phi)
+        if up == 1:
+            hirt = hirt.conjugate()
+        h[m] *= hirt
+    
+    h = np.real(h)
+
+    # 2d convolution:        
+    z = np.ndarray(shape=(M, N), dtype='complex')
+    # temporal convolution:
+    for m in range(M):
+        X = fft(x[m])
+        H = fft(h[m])
+        
+        Y = X*H
+        y = ifft(Y)
+        z[m] = y
+        
+    # spectral convolution
+    x = z.transpose()
+    h = h.transpose()
+    z = z.transpose()
+    for n in range(N):
+        X = fft(x[n])
+        H = fft(h[n])
+       
+        Y = X*H
+        y = ifft(Y)
+        z[n] = y 
+    
+    z = z.transpose()
+
+    return z
+
+def spec(s, OM, PHI):   # , where:
+                        # - OM: spectral density;
+                        # - PHI: characteristic phase
+    ir = hs(s, OM)
+    hir = hilbert(ir)
+    y = ir * np.cos(PHI) + hir * np.sin(PHI)
+    return y + 1j*hilbert(y)
+
+def temp(t, om, phi):   # , where:
+                        # - om: spectral velocity
+                        # - phi: charac. phase
+    ir = ht(t, om)
+    hir = hilbert(ir)
+    y = ir * np.cos(phi) + hir * np.sin(phi)
+    return y + 1j*hilbert(y)
+    
+def hs(s, OM):  # spectral seed function, where:
+                # - OM: spectral density
+    sOM = s * OM
+    y = (1 - sOM*sOM) * np.exp(-(sOM*sOM) / 2.0)
+    return y * OM
+
+def ht(t, om):  # temporal seed function, where:
+                # - om: spectral velocity
+    tom = t * om
+    y = tom*tom * np.exp(-3.5 * tom) * np.sin(2.0 * np.pi * tom)
+    return y * om
+
+def hilbert(x):     #approximates hilbert transform
+    N = len(x)
+    pos = int(np.ceil(N / 2.0))
+    neg = int(np.floor(N / 2.0))
+    
+    X = fft(x)
+
+    h = np.zeros(N)
+    h[pos:] = 2.0 / (np.pi * np.arange(-neg, 0))
+    h[1:pos] = 2.0 / (np.pi * np.arange(1, pos))
+    h[::2] = 0
+    H = fft(h)
+    
+    Y = X*H
+    y = ifft(Y)
+    
+    return y 
+

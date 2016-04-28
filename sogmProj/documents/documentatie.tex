@@ -1,0 +1,142 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\title{Project Design}
+%\subtitle{SOGM project plan, Blok 2}
+\author{Akke Houben}
+\date{01-03-2015}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+\begin{figure}
+	\includegraphics{img/plan_tot.jpg}
+	\caption{Total plan of the system}
+	\label{fig:total}
+\end{figure}
+Altough the brainstructures processing speech and music appear to operate independently (left hemisphere being laterized for speech, right hemisphere for music (Kolb \& Whishaw, 1947; Marin \& Perry, 1999; Peretz, 2006)), there are many similarities how the brain is activated while interpreting speech and music (Zatorre et al., 1994; Trehub et al., 199). Especially the learning of sound categorization appear to uttilize similar mechanisms (McMullen \& Saffran, 2004; Hickock \& Poeppel, 2004; Patel, Peretz, et al., 1998). There are several researches available on computational models of hearing, but all are focussing on one particular part in the auditory pathway (Chi, et al., 2005; Chi, et al., 1999; Yang, et al., 1992).  In this project several computational models are combined to reach a complete model to investigate the Shared Sound Category Learning Mechanism Hypothesis.
+
+\section{Goal}
+At first the goal will be stated quickly: The goal is to create a computational model to investigate the plausibility of the Shared Sound Category Learning Mechanisms Hypothesis. The program wil consist of 3 major parts: 
+\begin{enumerate}
+	\item an input processing stage mimicking cochlear and cortical processing mechanisms (pre-processing); 
+	\item a machine learning/neural network to learn sound categorization and (neural network); 
+	\item a test-trial-scheduler which will feed sounds to the system, acquires the responses and displays them in a sensible way.
+\end{enumerate}
+The design is separated into three major parts, depicted in Figure \ref{fig:total} The first part is the 'pre-processing phase', here the incoming audio will be processed and transformed in suitable input for the 'learning phase'. The second part is the Artificial Neural Network, of which will account for the actual 'learning phase'. The third part is the test-trial scheduler, but this will -for now- not be imlemented in this project-phase.
+
+\section{Design: Pre-Processing Phase}
+The preprocessing phase will consist of -again- two stages, following mainly the methods used by Chi, Ru and Shamma (Chi, et al., 2005) and Yang, Wang \& Shamma (Yang, et al., 1992). The first stage will follow the auditory pathway from the Cochlea, trough the Auditory Nerves and a Lateral Inhibitory Network (LIN). The output of this stage is first integrated over a short window, to account for a futher loss of phase locking. In the second stage the Spectro-Temporal Response Fields (STFRs) of the neurons in the Primary Auditory Cortex (A1) will be modelled. The outputs of these will serve as the input to the 'learning phase'.
+
+\begin{figure}
+	\includegraphics{img/stage1.jpg}
+	\caption{Pre-processing phase}
+	\label{fig:stage1_1}
+\end{figure}
+
+\subsection{Early Auditory Pathway}
+The first stage will folow the early auditory pathway form the Cochlea, trough the Auditory Nerves end the Lateral Inhibitory Network. In Figure \ref{fig:stage1_1} a schematic representation of the processing utilized in this stage is given.
+\subsubsection{Cochlear Filterbank}
+The function of the Chochlea can be viewed as a parallel bank of filters (Chi et al., 2005; Yang et al., 1992). The audio is separated into $M$ frequency bands by a bank of gammatone filters mimicking the tonotopic filtering on the Basilar Membrane. The impulse response of the gammatone filters are given by the following equation (from Strahl, 2009):
+\begin{equation*}
+h[m][n] = an^{v-1}e^{-qn}e^{j2\pi f_{c} n}
+\end{equation*}
+Where:
+\begin{itemize}
+	\item  $a$ is the amplitude; 
+	\item $v$ is the filter order (for human auditory filters a 4th order is common (Strahl, 2009); 
+	\item $f_{c}$ is the center frequency and;
+	\item $q$ is the bandwidth, mostly given by: $2\pi b ERB(cf)$
+	\begin{itemize}
+		\item Where $b$ is usually 1.019 for human auditory modelling (Strahl, 2009) and;
+		\item $ERB(cf)$ is the equivalent reqtangular bandwidth at frequency $cf$ given by: $ERB(cf) = 24.7 + 1.108 cf$
+	\end{itemize}
+\end{itemize}
+This transforms the unidimensional audio signal into a two dimensional spectrogram showing the pressure variations in separate frequency bands.
+
+\subsubsection{Auditory Nerves}
+The $M$ audio signals of this two dimensional array are independently passed trough a system mimicking the effects of the transduction of the signals trough the Auditory Nerves. Here a cascading system of a simple differentiator, a non-linear compression and a integration over a small ($\approx 8ms$) is implemented, following Chi et al. (2005). The differentiator is simply the first order derivative of the individual signals with respect to the time index. 
+The non-linear compression is implemented using the following equation (from Yang et al., 1992): 
+\begin{equation*}
+	y[n] = \frac{1}{1 + e^{-g x[n]}} - \frac{1}{2}
+\end{equation*}
+Where:
+\begin{itemize}
+	\item g is the gain factor.
+\end{itemize}
+The integration is done over a short temporal window of about $8ms$ in length. Thus providing a temporal smoothing to achieve the loss of phaselocking above $\approx 4kHz$. After a few tests the blackman window was found to be the best fit for this task.
+
+
+\subsubsection{Lateral Inhibitory Network}
+The signals are then passed trough a Lateral Inhibitory Network (LIN). This LIN serves to suppress the excitation of the neurons next to the peaking-neurons. Thus further narrowing the position on the tonotopic axis where the maximal excitation is located (??, ????).
+In this model the processes are severely simplified, as Chi, Ru and Shamma (2005) also state, but are sufficient for a first version. This is a clear point of improvement for further investigation.
+First the derivative of the signal along the tonotopic (frequency) axis is taken.
+\begin{equation*}
+    \vec{y}[m] = \frac{\delta \vec{x}[m]}{\delta m}
+\end{equation*}
+
+Then a simple half wave rectifier is applied:
+\begin{equation*}
+    y[n] = \frac{\sqrt{x[n]^{2}} + x[n]}{2}
+\end{equation*}
+
+
+%\subsubsection{Final}
+%To finish the processing of this stage the signals are integrated over a short window $w$ to account for the further loss of phase locking in the midbrain (Chi, T., Powen, R. \& Shamma, S.A., 2005)
+%\begin{equation*}
+%    w[n] = e^{-n/\tau} u[n]
+%\end{equation*}
+%Where:
+%\begin{itemize}
+%    \item $\tau$ is a time constant ($\approx 8ms$)
+%\end{itemize}
+
+
+\subsection{Spectro-Temporal Response Fields}
+\begin{figure}
+	\includegraphics[width=\linewidth]{img/strfs.jpg}
+	\caption{STRFs recorded from A1 of ferrets (taken from Chi, Ru \& Shamma, 2005)}
+	\label{fig:strfs}
+\end{figure}
+In this stage the responses of the neurons in the Primary Auditory Cortex (A1) are modelled. In several sensory pathways certain neurons react to stimuli with a specific spectro-temporal characteristic. Figure \ref{fig:strfs} shows STRFs recorded form A1 of ferrets. This functionality is simulated using a bank of filters which are selective to specific spectro-temporal patterns. The set of filters with temporal selectivity from $1$ to $300Hz$ and spectral selectivity from $0.25$ to $8 cycles/octave$ are sufficient for speech characterisation (Chi, et al., 2005).
+
+%\subsubsection{Obtaining Coefficients}
+%The coeficients of these STRFs will, for this implementation, probably be obtained by taking multiple affine wavelet transforms of the outputs of the first stage (Early Auditory Pathway) when several example speech sounds are used as input.
+%The specific method used will be clarified in a later stage.
+\subsubsection{Implementation}
+The STRF filterbank is equivalent to a complex two-dimensional wavelet transform with temporal ($h_{t}$) and spectral ($h_{s}$) seed functions:
+\begin{equation*}
+	h_{t}[\omega n] = \omega n^{2}e^{-3.5n}sin{2\pi n}
+\end{equation*}
+\begin{equation*}
+	h_{s}[\Omega m] = \Omega (1 - m^{2})e^{-m^{2} / 2}
+\end{equation*}
+Where:
+\begin{itemize}
+	\item $m$ is the tonotopic (frequency-band) index;
+	\item $\omega$ is the temporal modulation rate and;
+	\item $\Omega$ is the spectral modulation rate;
+\end{itemize}
+
+The input for this wavelet transform is a two dimensional matrix of $M * samples$. With $M$ around 63 for sufficient frequency resolution and $samples$ with a \emph{minimum} of about 44100 (1 second of audio), but preferably more. The matrix will thus consist of -at minimum- $63 * 44100 = 2778300$ floatingpoint numbers. With the current implementation each two-dimensional wavelet transform takes $M$ $samples$-by-$samples$ convolutions and after that $samples$ $M$-by-$M$ convolutions for \emph{each} value of $\omega$ and $\Omega$.
+	Thus creating  a highly computationally intensive operation. With this implementation no test runs of this stage could be performed. In the next stage of the project the STRFs calculations will be reviewed and rewritten to be more efficient and useable in big test runs.
+
+\section{References}
+\begin{itemize}
+	\item[] ref1
+\end{itemize}
+
+
+%\section{Learning Phase}
+%In this phase the actual learning will take place. An Artificial Neural Network will be modelled which will take the outputs of the STRFs neurons of the preceding section as input and will output a classification of the input as either \emph{speech} or \emph{non-speech}.
+%\subsection{Implementation}
+%The specific type of Neural Network, the design and implementation will be elaborated on in a later stage. Probably a ART-2 network will be used.
+
+%\section{Scheduler}
+%Finally, a system will be made which will input a corpus of sound to the system. The audio-data is put into the Pre-Processing and Learning system. %The meta-data is forwarded to a result checking system, which will either serve as a \emph{feedback} for the Learning phase or which will save the %classification of the Neural Network and the expected outcome. 
+
+%\subsection{Implementation}
+%The specific implementation will be described at a later stage.	
+
+\end{document}
